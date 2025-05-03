@@ -1,5 +1,7 @@
 #include "acequia_manager.h"
 #include <iostream>
+#include <vector>
+#include <string>
 
 /*Instructions for this problem:
 
@@ -47,37 +49,69 @@ void solveProblems(AcequiaManager& manager)
 
 
 /*example 2 format*/
+// Find index of the first canal from a source region
+int findCanal(const std::vector<Canal*>& canals, const std::string& sourceRegion) {
+	for (int i = 0; i < canals.size(); ++i) {
+		if (canals[i]->sourceRegion->name == sourceRegion) {
+			return i;
+		}
+	}
+	return -1; // Not found
+}
 
-void solveProblems(AcequiaManager& manager)
-{
+// Open a canal from a region to release water
+void release(const std::vector<Canal*>& canals, const std::string& region) {
+	int index = findCanal(canals, region);
+	if (index != -1) {
+		canals[index]->toggleOpen(true);
+		canals[index]->setFlowRate(1.0);
+	}
+}
+
+// Close all canals from a region to stop water flow
+void close(const std::vector<Canal*>& canals, const std::string& region) {
+	int index = findCanal(canals, region);
+	if (index != -1) {
+		canals[index]->toggleOpen(false);
+	}
+}
+
+// Main solution logic, at least the best i could come up with
+void solveProblems(AcequiaManager& manager) {
 	auto canals = manager.getCanals();
-	while(!manager.isSolved && manager.hour!=manager.SimulationMax)
-	{
-	//Students will implement this function to solve the probelms
-	//Example: Adjust canal flow rates and directions
-		if(manager.hour==0)
-		{
-			canals[0]->setFlowRate(1);
-			canals[0]->toggleOpen(true);
-		}
-		else if(manager.hour==1)
-		{
-			canals[1]->setFlowRate(0.5);
-			canals[1]->toggleOpen(true);
-		}
-		else if(manager.hour==82)
-		{
-			canals[0]->toggleOpen(false);
-			canals[1]->toggleOpen(false);
-		}
-	//student may add any necessary functions or check on the progress of each region as the simulation moves forward. 
-	//The manager takes care of updating the waterLevels of each region and waterSource while the student is just expected
-	//to solve how to address the state of each region
+	auto regions = manager.getRegions();
 
-		
+	while (!manager.isSolved && manager.hour != manager.SimulationMax) {
+
+		for (int i = 0; i < regions.size(); ++i) {
+			Region* region = regions[i];
+
+			// Handle conflicting status
+			if (region->isFlooded && region->isInDrought) {
+				close(canals, region->name);
+			}
+			// If the region is flooded, release water from it
+			else if (region->isFlooded) {
+				release(canals, region->name);
+			}
+			// If the region is in drought, open canals TO it
+			else if (region->isInDrought) {
+				for (int j = 0; j < canals.size(); ++j) {
+					if (canals[j]->destinationRegion->name == region->name) {
+						canals[j]->toggleOpen(true);
+						canals[j]->setFlowRate(1.0);
+					}
+				}
+			}
+		}
+
 		manager.nexthour();
 	}
 }
+
+	//student may add any necessary functions or check on the progress of each region as the simulation moves forward. 
+	//The manager takes care of updating the waterLevels of each region and waterSource while the student is just expected
+	//to solve how to address the state of each region
 
 
 /*example 2*/
