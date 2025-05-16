@@ -36,6 +36,7 @@ void solveProblems(AcequiaManager& manager) {
 	auto regions = manager.getRegions();
 
 	while (!manager.isSolved && manager.hour != manager.SimulationMax) {
+<<<<<<< HEAD
 
 		for (int i = 0; i < regions.size(); ++i) {
 			Region* region = regions[i];
@@ -56,13 +57,40 @@ void solveProblems(AcequiaManager& manager) {
 						canals[j]->setFlowRate(1.0);
 					}
 				}
+=======
+		for (auto canal : canals) {
+			Region* src = canal->sourceRegion;
+			Region* dst = canal->destinationRegion;
+
+			// Determine if the source has extra water
+			bool sourceHasExtra = src->waterLevel > src->waterNeed;
+
+			// Determine if destination is in drought or still below its need
+			bool destNeedsMore = dst->waterLevel < dst->waterNeed;
+
+			// Extra condition: avoid sending water if destination is already near capacity
+			bool destNotNearCapacity = dst->waterLevel < (dst->waterCapacity - 10);
+
+			if (sourceHasExtra && destNeedsMore && destNotNearCapacity) {
+				canal->toggleOpen(true);
+
+				// Dynamically adjust flow rate based on how much the destination needs
+				double deficit = dst->waterNeed - dst->waterLevel;
+				double flowRate = std::min(1.0, deficit / 20.0); // Cap flow rate
+				canal->setFlowRate(flowRate);
+			} else {
+				canal->toggleOpen(false);
+>>>>>>> 6aff417aaf576305d56980d36adda987e66729b1
 			}
 		}
 
 		manager.nexthour();
 	}
 }
+<<<<<<< HEAD
 
 
 
 	
+=======
+>>>>>>> 6aff417aaf576305d56980d36adda987e66729b1
