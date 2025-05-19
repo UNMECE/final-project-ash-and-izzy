@@ -36,28 +36,6 @@ void solveProblems(AcequiaManager& manager) {
 	auto regions = manager.getRegions();
 
 	while (!manager.isSolved && manager.hour != manager.SimulationMax) {
-<<<<<<< HEAD
-
-		for (int i = 0; i < regions.size(); ++i) {
-			Region* region = regions[i];
-
-			// Handle conflicting status
-			if (region->isFlooded && region->isInDrought) {
-				close(canals, region->name);
-			}
-			// If the region is flooded, release water from it
-			else if (region->isFlooded) {
-				release(canals, region->name);
-			}
-			// If the region is in drought, open canals TO it
-			else if (region->isInDrought) {
-				for (int j = 0; j < canals.size(); ++j) {
-					if (canals[j]->destinationRegion->name == region->name) {
-						canals[j]->toggleOpen(true);
-						canals[j]->setFlowRate(1.0);
-					}
-				}
-=======
 		for (auto canal : canals) {
 			Region* src = canal->sourceRegion;
 			Region* dst = canal->destinationRegion;
@@ -80,17 +58,9 @@ void solveProblems(AcequiaManager& manager) {
 				canal->setFlowRate(flowRate);
 			} else {
 				canal->toggleOpen(false);
->>>>>>> 6aff417aaf576305d56980d36adda987e66729b1
 			}
 		}
 
 		manager.nexthour();
 	}
 }
-<<<<<<< HEAD
-
-
-
-	
-=======
->>>>>>> 6aff417aaf576305d56980d36adda987e66729b1
